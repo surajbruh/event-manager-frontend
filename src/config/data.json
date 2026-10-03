@@ -1,0 +1,15 @@
+{
+  "routes": [
+    {
+      "name": "home",
+      "href": "/"
+    }
+  ],
+
+  "protectedRoutes": [
+    {
+      "name": "profile",
+      "href": "/profile"
+    }
+  ]
+}
