@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "./auth/useAuth";
+import { useAuth } from "./service/auth/useAuth";
 
 export default function Protected() {
   const { state: authState } = useAuth();

@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 import { ctx, type ActionType, type AuthState } from "./AuthContext";
-import { axiosInstance } from "../axiosInstance";
+import { axiosInstance } from "../../axiosInstance";
 
 const initialState: AuthState = {
   user: null,

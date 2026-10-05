@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { useAuth } from "./auth/useAuth";
-import { useEvent } from "./events/useEvent";
+import { useAuth } from "./service/auth/useAuth";
+import { useEvent } from "./service/events/useEvent";
 
 export default function App() {
   const { state } = useAuth();

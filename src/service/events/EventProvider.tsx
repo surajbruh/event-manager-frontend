@@ -4,7 +4,7 @@ import {
   type EventActionType,
   type EventState,
 } from "./EventContext";
-import { axiosInstance } from "../axiosInstance";
+import { axiosInstance } from "../../axiosInstance";
 
 function reducer(state: EventState, action: EventActionType): EventState {
   switch (action.type) {

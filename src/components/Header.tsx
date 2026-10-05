@@ -1,4 +1,4 @@
-import { useAuth } from "../auth/useAuth";
+import { useAuth } from "../service/auth/useAuth";
 import { axiosInstance } from "../axiosInstance";
 import { routes, protectedRoutes } from "../config/data.json";
 import { NavLink } from "react-router";
