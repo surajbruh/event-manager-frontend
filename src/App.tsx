@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "./service/auth/useAuth";
 import { useEvent } from "./service/events/useEvent";
+import { Link } from "react-router";
 
 export default function App() {
   const { state } = useAuth();
@@ -23,10 +24,28 @@ export default function App() {
           <p>fetching events...</p>
         ) : (
           <div>
-            {/* The arguments (null, 2) add 2 spaces of indentation */}
-            <pre style={{ background: "#f4f4f4", padding: "10px" }}>
-              {JSON.stringify(eventState.events, null, 2)}
-            </pre>
+            {eventState.events.length === 0 ? (
+              <h1>no events</h1>
+            ) : (
+              <ul>
+                {eventState.events.map((event) => (
+                  <Link
+                    key={event._id}
+                    to={`events/${event._id}`}
+                    className="mb-4"
+                  >
+                    <pre
+                      style={{
+                        background: "#f4f4f4",
+                        padding: "10px",
+                      }}
+                    >
+                      {JSON.stringify(event, null, 2)}
+                    </pre>
+                  </Link>
+                ))}
+              </ul>
+            )}
           </div>
         )}
       </div>

@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Header from "./components/Header.tsx";
 import Profile from "./pages/Proflie.tsx";
 import Protected from "./Protected.tsx";
+import EventPage from "./pages/Event.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -20,6 +21,7 @@ createRoot(document.getElementById("root")!).render(
             <Route element={<Protected />}>
               <Route path="/profile" element={<Profile />} />
             </Route>
+            <Route path="events/:id" element={<EventPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

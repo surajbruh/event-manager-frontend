@@ -23,6 +23,21 @@ function reducer(state: EventState, action: EventActionType): EventState {
         events: action.payload,
       };
 
+    case "SET_EVENT":
+      return {
+        ...state,
+        selectedEvent: action.payload,
+      };
+
+    case "FETCHING_EVENT":
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          event: action.payload,
+        },
+      };
+
     default:
       return state;
   }
@@ -31,8 +46,10 @@ function reducer(state: EventState, action: EventActionType): EventState {
 const initialState: EventState = {
   events: [],
   loading: {
-    events: true,
+    events: true, //true because EventProvider mounts before App
+    event: false,
   },
+  selectedEvent: null,
 };
 
 function EventProvider({ children }: { children: React.ReactNode }) {

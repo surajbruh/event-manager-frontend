@@ -2,6 +2,7 @@ import { useAuth } from "../service/auth/useAuth";
 
 export default function Profile() {
   const { state: authState } = useAuth();
+
   return (
     <>
       <h1> Profile page!</h1>
