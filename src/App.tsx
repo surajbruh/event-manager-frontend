@@ -1,54 +1,33 @@
+import { BrowserRouter, Route, Routes } from "react-router";
+import Home from "./pages/Home";
+import Protected from "./Protected";
 import { useEffect } from "react";
 import { useAuth } from "./service/auth/useAuth";
 import { useEvent } from "./service/events/useEvent";
-import { Link } from "react-router";
 
 export default function App() {
-  const { state } = useAuth();
+  const { state: auth } = useAuth();
   const { state: eventState } = useEvent();
 
   useEffect(() => {
-    console.log(state);
-  }, [state]);
+    console.log(auth.user);
+  }, [auth]);
 
   useEffect(() => {
-    console.log(eventState);
+    console.log(eventState.events);
   }, [eventState]);
 
-  if (state.loading.auth) return <h1>Loading...</h1>;
-
   return (
-    <>
-      <div>
-        {eventState.loading.events ? (
-          <p>fetching events...</p>
-        ) : (
-          <div>
-            {eventState.events.length === 0 ? (
-              <h1>no events</h1>
-            ) : (
-              <ul>
-                {eventState.events.map((event) => (
-                  <Link
-                    key={event._id}
-                    to={`events/${event._id}`}
-                    className="mb-4"
-                  >
-                    <pre
-                      style={{
-                        background: "#f4f4f4",
-                        padding: "10px",
-                      }}
-                    >
-                      {JSON.stringify(event, null, 2)}
-                    </pre>
-                  </Link>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-      </div>
-    </>
+    <BrowserRouter>
+      {/* <Header /> */}
+      <Routes>
+        <Route index element={<Home />} />
+        <Route element={<Protected />}>
+          {/* <Route path="/profile" element={<Profile />} />
+          <Route path="/events/new" element={<EventForm />} /> */}
+        </Route>
+        {/* <Route path="events/:id" element={<EventPage />} /> */}
+      </Routes>
+    </BrowserRouter>
   );
 }

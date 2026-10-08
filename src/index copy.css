@@ -1,0 +1,259 @@
+:root {
+  --paper: #eef1f6;
+  --ink: #1b1f3b;
+  --iris: #4b3fe0;
+  --sun: #ffc857;
+  --mist: #d9deea;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Instrument Sans", system-ui, sans-serif;
+}
+h1,
+h2,
+.brand {
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+h1 {
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1.05;
+  margin: 2rem 0 0;
+  font-weight: 800;
+}
+a {
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--iris);
+  outline-offset: 2px;
+}
+header {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+main {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1.25rem 5rem;
+}
+button,
+.btn {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem 1.2rem;
+  background: var(--iris);
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+}
+button:hover,
+.btn:hover {
+  background: var(--ink);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid #1b1f3b33;
+}
+.ghost:hover {
+  background: var(--mist);
+}
+.link {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+.link:hover {
+  background: none;
+  text-decoration: underline;
+}
+.danger {
+  color: #b91c1c;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  margin-top: 0.25rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--mist);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+form.narrow {
+  max-width: 26rem;
+  margin-top: 1.5rem;
+}
+form.wide {
+  max-width: 36rem;
+  margin-top: 1.5rem;
+}
+.row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 1rem;
+}
+.row input {
+  max-width: 28rem;
+  margin: 0;
+}
+.chip {
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 0;
+  color: var(--ink);
+}
+.chip.on {
+  background: var(--iris);
+  color: #fff;
+}
+.grid {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+}
+.card {
+  display: flex;
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  text-decoration: none;
+}
+.card:hover {
+  box-shadow: 0 8px 24px #1b1f3b1f;
+}
+.stub {
+  background: var(--sun);
+  width: 6rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px dashed var(--mist);
+}
+.stub b {
+  font:
+    800 2.2rem "Bricolage Grotesque",
+    sans-serif;
+}
+.card div:last-child {
+  padding: 1rem;
+}
+.card h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.2rem;
+}
+.muted {
+  color: #1b1f3bb3;
+  font-size: 0.9rem;
+}
+.alert {
+  background: var(--sun);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+.alert ul {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+}
+.detail {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1fr;
+  margin-top: 2rem;
+}
+@media (min-width: 48rem) {
+  .detail {
+    grid-template-columns: 1fr 20rem;
+  }
+}
+aside.box {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  height: fit-content;
+}
+.bar {
+  height: 0.5rem;
+  border-radius: 99px;
+  background: var(--mist);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--iris);
+}
+.pills {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.pills li {
+  background: #fff;
+  border-radius: 99px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.9rem;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.list a {
+  display: flex;
+  justify-content: space-between;
+  background: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  text-decoration: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card {
+    transition: box-shadow 0.2s;
+  }
+}
