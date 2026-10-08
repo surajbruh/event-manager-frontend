@@ -4,6 +4,9 @@ import Protected from "./Protected";
 import { useEffect } from "react";
 import { useAuth } from "./service/auth/useAuth";
 import { useEvent } from "./service/events/useEvent";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   const { state: auth } = useAuth();
@@ -19,7 +22,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      {/* <Header /> */}
+      <Header />
       <Routes>
         <Route index element={<Home />} />
         <Route element={<Protected />}>
@@ -27,7 +30,10 @@ export default function App() {
           <Route path="/events/new" element={<EventForm />} /> */}
         </Route>
         {/* <Route path="events/:id" element={<EventPage />} /> */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
+
+      <Footer />
     </BrowserRouter>
   );
 }

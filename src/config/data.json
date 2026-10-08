@@ -5,7 +5,6 @@
   ],
 
   "protectedRoutes": [
-    { "name": "logout", "href": "/auth/logout" },
     { "name": "profile", "href": "/profile" },
     { "name": "create event", "href": "/events/new" }
   ],
