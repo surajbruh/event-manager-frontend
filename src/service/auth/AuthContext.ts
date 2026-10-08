@@ -25,7 +25,7 @@ type ActionType =
       payload: User | null;
     }
   | {
-      type: "AUTH_CHECK_COMPLETE";
+      type: "AUTHENTICATING";
       payload: boolean;
     }
   | {

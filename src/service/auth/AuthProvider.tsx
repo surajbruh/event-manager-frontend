@@ -19,12 +19,12 @@ function reducer(state: AuthState, action: ActionType): AuthState {
         user: action.payload,
       };
 
-    case "AUTH_CHECK_COMPLETE":
+    case "AUTHENTICATING":
       return {
         ...state,
         loading: {
           ...state.loading,
-          auth: false,
+          auth: action.payload,
         },
       };
 
@@ -66,7 +66,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         });
       })
       .catch(() => {})
-      .finally(() => dispatch({ type: "AUTH_CHECK_COMPLETE", payload: true }));
+      .finally(() => dispatch({ type: "AUTHENTICATING", payload: false }));
   }, []);
 
   return <ctx.Provider value={{ state, dispatch }}>{children}</ctx.Provider>;

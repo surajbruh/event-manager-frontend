@@ -1,6 +1,6 @@
 {
   "routes": [
-    { "name": "signup", "href": "/auth/signup" },
+    { "name": "signup", "href": "/auth/register" },
     { "name": "login", "href": "/auth/login" }
   ],
 

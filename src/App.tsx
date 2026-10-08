@@ -7,6 +7,8 @@ import { useEvent } from "./service/events/useEvent";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import NotFound from "./pages/NotFound";
+import AuthPage from "./pages/AuthPage";
+import Profile from "./pages/Proflie";
 
 export default function App() {
   const { state: auth } = useAuth();
@@ -25,9 +27,11 @@ export default function App() {
       <Header />
       <Routes>
         <Route index element={<Home />} />
+        <Route path="/auth/register" element={<AuthPage mode={"REGISTER"} />} />
+        <Route path="/auth/login" element={<AuthPage mode={"LOGIN"} />} />
         <Route element={<Protected />}>
-          {/* <Route path="/profile" element={<Profile />} />
-          <Route path="/events/new" element={<EventForm />} /> */}
+          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/events/new" element={<EventForm />} /> */}
         </Route>
         {/* <Route path="events/:id" element={<EventPage />} /> */}
         <Route path="*" element={<NotFound />} />
