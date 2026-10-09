@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Proflie";
+import EventPage from "./pages/Event";
 
 export default function App() {
   const { state: auth } = useAuth();
@@ -33,7 +34,7 @@ export default function App() {
           <Route path="/profile" element={<Profile />} />
           {/* <Route path="/events/new" element={<EventForm />} /> */}
         </Route>
-        {/* <Route path="events/:id" element={<EventPage />} /> */}
+        <Route path="events/:id" element={<EventPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

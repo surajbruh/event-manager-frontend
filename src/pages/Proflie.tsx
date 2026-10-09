@@ -4,6 +4,9 @@ import { useAuth } from "../service/auth/useAuth";
 import { useEvent } from "../service/events/useEvent";
 import { formatEventDate } from "../config/formatDate";
 
+// imporve events filtering, maybe update db, schema to allow n to n relationship
+// add server caching
+
 export default function Profile() {
   const { state: auth, dispatch } = useAuth();
   const { state: eventState } = useEvent();

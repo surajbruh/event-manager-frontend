@@ -3,23 +3,67 @@ import { useNavigate, useParams } from "react-router";
 import { axiosInstance } from "../axiosInstance";
 import { useEvent } from "../service/events/useEvent";
 import { useAuth } from "../service/auth/useAuth";
+import { formatEventDate } from "../config/formatDate";
 
-export default function EventPage() {
+export default function Event() {
   const { id } = useParams();
 
-  const { state: authState } = useAuth();
+  const { state: auth } = useAuth();
   const { state: eventState, dispatch } = useEvent();
 
-  const [booking, setBooking] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [registering, setRegistering] = useState(false);
 
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
-  async function handleClick() {
+  // Fetch event
+  useEffect(() => {
+    dispatch({ type: "FETCHING_EVENT", payload: true });
+
+    axiosInstance
+      .get(`/events/${id}`)
+      .then((response) =>
+        dispatch({
+          type: "SET_EVENT",
+          payload: response.data.event,
+        }),
+      )
+      .finally(() =>
+        dispatch({
+          type: "FETCHING_EVENT",
+          payload: false,
+        }),
+      );
+  }, [id, dispatch]);
+
+  if (eventState.loading.event) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+        <p aria-live="polite">Fetching event...</p>
+      </main>
+    );
+  }
+
+  if (!eventState.selectedEvent) {
+    return null;
+  }
+
+  const event = eventState.selectedEvent;
+
+  const spotsLeft = event.capacity - event.attendees.length;
+  const isRegistered = auth.user
+    ? event.attendees.includes(auth.user.id)
+    : false;
+
+  async function handleRegistration() {
+    if (!auth.user) {
+      navigate("/auth/login");
+      return;
+    }
+
     try {
-      if (!authState.user) return nav("/");
-      setBooking(true);
-      const response = await axiosInstance.patch(`/events/${id}/register`);
+      setRegistering(true);
+
+      const response = await axiosInstance.patch(`/events/${id}`);
 
       dispatch({
         type: "SET_EVENT",
@@ -28,93 +72,108 @@ export default function EventPage() {
     } catch (error) {
       console.error(error);
     } finally {
-      setBooking(false);
+      setRegistering(false);
     }
   }
-
-  async function handleDelete() {
-    try {
-      setDeleting(true);
-      const response = await axiosInstance.delete(`/events/${id}`);
-      if (response.status === 200) {
-        dispatch({
-          type: "SET_EVENTS",
-          payload: eventState.events.filter((event) => event._id !== id),
-        });
-
-        dispatch({
-          type: "SET_EVENT",
-          payload: null,
-        });
-
-        nav("/");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setDeleting(false);
-    }
-  }
-
-  useEffect(() => {
-    dispatch({ type: "FETCHING_EVENT", payload: true });
-    axiosInstance
-      .get(`/events/${id}`)
-      .then((response) =>
-        dispatch({ type: "SET_EVENT", payload: response.data.event }),
-      )
-      .finally(() => dispatch({ type: "FETCHING_EVENT", payload: false }));
-  }, [id, dispatch]);
-
-  if (eventState.loading.event) return <h1>fetching event...</h1>;
-  if (!eventState.selectedEvent) return null;
 
   return (
-    <>
-      <pre
-        style={{
-          background: "#f4f4f4",
-          padding: "10px",
-        }}
-      >
-        {JSON.stringify(eventState.selectedEvent, null, 2)}
-      </pre>
+    <main>
+      <article className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-8 md:px-8 md:py-12">
+        {/* Event information */}
+        <header className="mb-8 sm:mb-10">
+          <p className="mb-2 text-sm capitalize text-gray-600">
+            Hosted by {event.organizer}
+          </p>
 
-      <h1 className="uppercase">book tickets</h1>
-      <button
-        onClick={handleClick}
-        disabled={
-          eventState.selectedEvent.attendees.some(
-            (attendeeId) => attendeeId === authState.user?.id,
-          ) || booking
-        }
-        className="px-4 py-1 border-black border bg-green-500 text-white uppercase"
-      >
-        {/* if !user = login txt
-          if selected.attendees include user.id then booked txt
-          if booking loading state = true then booking txt
-        */}
-        {authState.user
-          ? eventState.selectedEvent.attendees.some(
-              (attendeeId) => attendeeId === authState.user?.id,
-            )
-            ? "booked"
-            : booking
-              ? "booking..."
-              : "bookTicket"
-          : "login"}
-      </button>
+          <h1 className="mb-2 text-4xl font-bold uppercase leading-tight sm:text-5xl md:text-[52px]">
+            {event.title}
+          </h1>
 
-      {(authState.user?.role === "admin" ||
-        eventState.selectedEvent.organizer === authState.user?.id) && (
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="px-4 py-1 border-black border bg-red-500 text-white uppercase"
-        >
-          {deleting ? "deleting..." : "delete event"}
-        </button>
-      )}
-    </>
+          <address className="not-italic">
+            <p className="capitalize">{event.location}</p>
+
+            <time
+              dateTime={event.startDate.toString()}
+              className="capitalize text-gray-600"
+            >
+              {formatEventDate(event.startDate.toString()).compact}
+            </time>
+          </address>
+        </header>
+
+        {/* Event image */}
+        <figure className="mb-8 w-full overflow-hidden rounded-md bg-amber-100">
+          <img
+            src="/image.jpg"
+            alt={`${event.title} event`}
+            loading="lazy"
+            className="mx-auto aspect-video w-full object-cover object-center"
+          />
+        </figure>
+
+        {/* Event details */}
+        <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-[3fr_1fr] lg:gap-12">
+          <section aria-labelledby="description-heading">
+            <h2 id="description-heading" className="mb-3 text-2xl font-bold">
+              About this event
+            </h2>
+
+            <p className="leading-relaxed">{event.description}</p>
+          </section>
+
+          {/* Registration */}
+          <aside
+            aria-labelledby="registration-heading"
+            className="h-fit space-y-3 bg-gray-100 p-4 sm:p-5"
+          >
+            <h2 id="registration-heading" className="font-semibold">
+              Registration
+            </h2>
+
+            <p>
+              {spotsLeft} of {event.capacity} spots left
+            </p>
+
+            <button
+              type="button"
+              disabled={registering || isRegistered}
+              onClick={handleRegistration}
+              className="w-full rounded-xl bg-black px-4 py-3 text-white hover:underline disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit"
+            >
+              {!auth.user
+                ? "Login"
+                : registering
+                  ? "..."
+                  : isRegistered
+                    ? "Already registered"
+                    : "Reserve your spot"}
+            </button>
+          </aside>
+        </div>
+
+        {/* Event controls */}
+        {auth.user &&
+          (auth.user.role === "admin" || event.organizer === auth.user.id) && (
+            <section
+              aria-label="Event management"
+              className="flex flex-col gap-3 sm:flex-row sm:gap-4"
+            >
+              <button
+                type="button"
+                className="w-full rounded-xl border px-4 py-2 hover:underline sm:w-fit sm:px-5"
+              >
+                Cancel event
+              </button>
+
+              <button
+                type="button"
+                className="w-full rounded-xl border border-black px-4 py-2 text-red-500 hover:border-red-500 hover:underline sm:w-fit sm:px-5"
+              >
+                Delete
+              </button>
+            </section>
+          )}
+      </article>
+    </main>
   );
 }
