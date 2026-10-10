@@ -1,14 +1,19 @@
 import type React from "react";
 import Slides from "../components/Slides";
-import { categories, events } from "../config/data.json";
+import { categories } from "../config/data.json";
 import { formatEventDate } from "../config/formatDate";
 import { Link } from "react-router";
-
-function handleFormSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-  e.preventDefault();
-}
+import { useEvent } from "../service/events/useEvent";
 
 export default function Home() {
+  const { state, updateParams } = useEvent();
+
+  function handleFormSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const value = new FormData(e.target).get("q") || "";
+    updateParams("q", value as string);
+  }
+
   return (
     <main>
       <Slides />
@@ -55,7 +60,11 @@ export default function Home() {
           <ul className="flex gap-4 overflow-x-auto pb-1 sm:gap-5">
             {["", ...categories].map((category) => (
               <li key={category} className="shrink-0">
-                <button type="button" className="underline hover:font-semibold">
+                <button
+                  type="button"
+                  className="underline hover:font-semibold"
+                  onClick={() => updateParams("category", category)}
+                >
                   {category || "All"}
                 </button>
               </li>
@@ -70,7 +79,7 @@ export default function Home() {
           </h2>
 
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {events.map((event) => (
+            {state.events.map((event) => (
               <li
                 key={event._id}
                 className="rounded-lg p-2 transition hover:bg-black/10 hover:shadow"

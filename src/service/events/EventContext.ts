@@ -36,11 +36,20 @@ type EventActionType =
       payload: boolean;
     };
 
+type ParamsType = "q" | "category";
+
 interface EventContext {
   state: EventState;
   dispatch: React.Dispatch<EventActionType>;
+  updateParams: (param: ParamsType, value?: string) => void; // it's helps set URL query params.
 }
 
 const EventCtx = createContext<EventContext | null>(null);
 
-export { EventCtx, type Event, type EventState, type EventActionType };
+export {
+  EventCtx,
+  type Event,
+  type EventState,
+  type EventActionType,
+  type ParamsType,
+};

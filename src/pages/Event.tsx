@@ -12,6 +12,7 @@ export default function Event() {
   const { state: eventState, dispatch } = useEvent();
 
   const [registering, setRegistering] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -35,6 +36,7 @@ export default function Event() {
       );
   }, [id, dispatch]);
 
+  // loading state
   if (eventState.loading.event) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
@@ -43,9 +45,7 @@ export default function Event() {
     );
   }
 
-  if (!eventState.selectedEvent) {
-    return null;
-  }
+  if (!eventState.selectedEvent) return null;
 
   const event = eventState.selectedEvent;
 
@@ -73,6 +73,22 @@ export default function Event() {
       console.error(error);
     } finally {
       setRegistering(false);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      setDeleting(true);
+      await axiosInstance.delete(`/events/${id}`);
+      dispatch({
+        type: "SET_EVENT",
+        payload: null,
+      });
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -167,9 +183,11 @@ export default function Event() {
 
               <button
                 type="button"
+                onClick={handleDelete}
+                disabled={deleting}
                 className="w-full rounded-xl border border-black px-4 py-2 text-red-500 hover:border-red-500 hover:underline sm:w-fit sm:px-5"
               >
-                Delete
+                {deleting ? "..." : "Delete"}
               </button>
             </section>
           )}

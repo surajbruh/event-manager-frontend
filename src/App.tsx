@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import Protected from "./Protected";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ export default function App() {
   }, [eventState]);
 
   return (
-    <BrowserRouter>
+    <>
       <Header />
       <Routes>
         <Route index element={<Home />} />
@@ -37,8 +37,7 @@ export default function App() {
         <Route path="events/:id" element={<EventPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-
       <Footer />
-    </BrowserRouter>
+    </>
   );
 }
