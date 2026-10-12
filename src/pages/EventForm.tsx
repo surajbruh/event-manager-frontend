@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../axiosInstance";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import type { Event } from "../service/events/EventContext";
+import { useEvent } from "../service/events/useEvent";
 
 export default function EventForm() {
   const { id } = useParams();
 
   const [eventData, setEventData] = useState<Event | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // const [eventCreated, setEventCreated] = useState(false);
   const [fetching, setFetching] = useState(true);
+
+  const navigate = useNavigate();
+
+  const { state, dispatch } = useEvent();
 
   async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -17,16 +23,18 @@ export default function EventForm() {
 
     setSubmitting(true);
 
-    const body = Object.fromEntries(new FormData(e.currentTarget));
+    const formData = new FormData(e.currentTarget);
+    console.log(formData);
 
-    console.log(body);
-
-    if (id) {
-      await axiosInstance.patch(`/events/${id}`);
-    }
     try {
-      // await axiosInstance.post("/events", body);
+      const response = await axiosInstance.post("/events", formData);
+      dispatch({
+        type: "SET_EVENTS",
+        payload: [...state.events, response.data.event],
+      });
+
       alert("Event created successfully");
+      navigate("/");
     } catch (error) {
       console.error(error);
     } finally {

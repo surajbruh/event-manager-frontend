@@ -87,7 +87,7 @@ export default function Home() {
                 <Link to={`/events/${event._id}`} className="block space-y-1">
                   <figure className="mb-4 aspect-video w-full overflow-hidden rounded-md">
                     <img
-                      src="/image.jpg"
+                      src={event.image || "/image.jpg"}
                       alt={event.title}
                       loading="lazy"
                       className="h-full w-full object-cover object-center"

@@ -80,9 +80,16 @@ export default function Event() {
     try {
       setDeleting(true);
       await axiosInstance.delete(`/events/${id}`);
+      // update current selected event state
       dispatch({
         type: "SET_EVENT",
         payload: null,
+      });
+
+      // update events state
+      dispatch({
+        type: "SET_EVENTS",
+        payload: [...eventState.events.filter((ev) => ev._id !== id)],
       });
       navigate("/");
     } catch (error) {
@@ -120,7 +127,7 @@ export default function Event() {
         {/* Event image */}
         <figure className="mb-8 w-full overflow-hidden rounded-md bg-amber-100">
           <img
-            src="/image.jpg"
+            src={event.image || "/image.jpg"}
             alt={`${event.title} event`}
             loading="lazy"
             className="mx-auto aspect-video w-full object-cover object-center"

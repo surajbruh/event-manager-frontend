@@ -8,8 +8,8 @@ const registerPayload = {
   password: "password",
 };
 const loginPayload = {
-  email: "adityachauhan044@gmail.com",
-  password: "surajyadav123",
+  email: "admin@event.com",
+  password: "password123",
 };
 
 export default function AuthPage({ mode }: { mode: "LOGIN" | "REGISTER" }) {

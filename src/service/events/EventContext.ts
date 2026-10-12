@@ -8,6 +8,7 @@ interface Event {
   startDate: Date;
   endDate: Date;
   capacity: number;
+  image?: string;
   status: "active" | "cancelled";
   organizer: string;
   attendees: string[];
