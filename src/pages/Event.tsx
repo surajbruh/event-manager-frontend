@@ -183,6 +183,14 @@ export default function Event() {
 
               <button
                 type="button"
+                onClick={() => navigate(`/events/${id}/edit`)}
+                className="w-full rounded-xl border px-4 py-2 hover:underline sm:w-fit sm:px-5"
+              >
+                Edit event
+              </button>
+
+              <button
+                type="button"
                 onClick={handleDelete}
                 disabled={deleting}
                 className="w-full rounded-xl border border-black px-4 py-2 text-red-500 hover:border-red-500 hover:underline sm:w-fit sm:px-5"

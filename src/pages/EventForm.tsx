@@ -1,105 +1,225 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { axiosInstance } from "../axiosInstance";
-
-const data = {
-  title: "Mumbai Tech Meetup 2026",
-  description:
-    "A community meetup for developers, engineers, and tech enthusiasts to discuss modern web development, AI, and emerging technologies.",
-  location: "WeWork, BKC, Mumbai",
-  startDate: "2026-10-15T10:00:00+05:30",
-  endDate: "2026-10-15T16:00:00+05:30",
-  capacity: 150,
-};
+import { useParams } from "react-router";
+import type { Event } from "../service/events/EventContext";
 
 export default function EventForm() {
+  const { id } = useParams();
+
+  const [eventData, setEventData] = useState<Event | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+
     if (submitting) return;
 
     setSubmitting(true);
-    const body = Object.fromEntries(new FormData(e.target));
-    console.log(body);
-    // body.date = new Date(body.date as string).toISOString();
 
+    const body = Object.fromEntries(new FormData(e.currentTarget));
+
+    console.log(body);
+
+    if (id) {
+      await axiosInstance.patch(`/events/${id}`);
+    }
     try {
-      await axiosInstance.post("/events", body);
-      alert("event created successfully");
+      // await axiosInstance.post("/events", body);
+      alert("Event created successfully");
     } catch (error) {
       console.error(error);
     } finally {
       setSubmitting(false);
     }
   }
+
+  useEffect(() => {
+    console.log(id);
+    if (!id) return;
+    axiosInstance
+      .get(`/events/${id}`)
+      .then((response) => setEventData(response.data.event))
+      .catch(() => {})
+      .finally(() => setFetching(false));
+  }, [id]);
+
+  if (fetching && id) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+        <p aria-live="polite">Fetching event details...</p>
+      </main>
+    );
+  }
+
   return (
-    <form className="wide" onSubmit={submit}>
-      {/* <Errors err={err} /> */}
-      <label>
-        Title
-        {/* <input name="title" required minLength={3} defaultValue={ev?.title} /> */}
-        <input name="title" required minLength={3} defaultValue={data.title} />
-      </label>
-      <label>
-        Description
-        <textarea
-          name="description"
-          required
-          minLength={10}
-          rows={4}
-          //   defaultValue={ev?.description}
-          defaultValue={data.description}
-        />
-      </label>
-      {/* <label>
-        Category
-        <select name="category" defaultValue={ev?.category}>
-          {CATEGORIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-      </label> */}
-      <label>
-        Capacity
-        <input
-          name="capacity"
-          type="number"
-          min={1}
-          //   defaultValue={ev?.capacity ?? 50}
-          defaultValue={data.capacity}
-        />
-      </label>
-      <label>
-        Start Date
-        <input
-          name="startDate"
-          type="date"
-          //   type="datetime-local"
-          required
-          //   defaultValue={ev ? toLocalInput(ev.date) : ""}
-          defaultValue={data.startDate}
-        />
-      </label>
-      <label>
-        Date and time
-        <input
-          name="endDate"
-          type="date"
-          //   type="datetime-local"
-          required
-          //   defaultValue={ev ? toLocalInput(ev.date) : ""}
-          defaultValue={data.startDate}
-        />
-      </label>
-      <label>
-        Location
-        {/* <input name="location" required defaultValue={ev?.location} /> */}
-        <input name="location" required defaultValue={data.location} />
-      </label>
-      {/* <button>{id ? "Save changes" : "Publish event"}</button> */}
-      <button disabled={submitting}>
-        {submitting ? "creating event..." : "create event"}
-      </button>
-    </form>
+    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 sm:py-12">
+      <section className="mx-auto max-w-3xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold uppercase leading-tight sm:text-4xl md:text-5xl">
+            {id ? "Edit event" : "Create an event"}
+          </h1>
+
+          <p className="mt-2 text-sm text-gray-600 sm:text-base">
+            Fill in the details below to publish your event.
+          </p>
+        </header>
+
+        <form
+          onSubmit={submit}
+          className="rounded-xl bg-white p-5 shadow-sm sm:p-8"
+        >
+          <div className="space-y-6">
+            {/* Title */}
+            <div>
+              <label htmlFor="title" className="mb-2 block text-sm font-medium">
+                Title
+              </label>
+
+              <input
+                id="title"
+                name="title"
+                required
+                minLength={3}
+                defaultValue={eventData?.title}
+                placeholder="Enter event title"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label
+                htmlFor="description"
+                className="mb-2 block text-sm font-medium"
+              >
+                Description
+              </label>
+
+              <textarea
+                id="description"
+                name="description"
+                required
+                minLength={10}
+                rows={5}
+                defaultValue={eventData?.description}
+                placeholder="Describe your event..."
+                className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+              />
+            </div>
+
+            {/* Capacity */}
+            <div>
+              <label
+                htmlFor="capacity"
+                className="mb-2 block text-sm font-medium"
+              >
+                Capacity
+              </label>
+
+              <input
+                id="capacity"
+                name="capacity"
+                type="number"
+                min={1}
+                required
+                defaultValue={eventData?.capacity}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+              />
+            </div>
+
+            {/* Dates */}
+            <fieldset>
+              <legend className="mb-3 text-sm font-medium">
+                Event schedule
+              </legend>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="startDate"
+                    className="mb-2 block text-sm text-gray-600"
+                  >
+                    Start date
+                  </label>
+
+                  <input
+                    id="startDate"
+                    name="startDate"
+                    type="date"
+                    required
+                    // defaultValue={}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="endDate"
+                    className="mb-2 block text-sm text-gray-600"
+                  >
+                    End date
+                  </label>
+
+                  <input
+                    id="endDate"
+                    name="endDate"
+                    type="date"
+                    required
+                    // defaultValue={}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+                  />
+                </div>
+              </div>
+            </fieldset>
+
+            {/* Location */}
+            <div>
+              <label
+                htmlFor="location"
+                className="mb-2 block text-sm font-medium"
+              >
+                Location
+              </label>
+
+              <input
+                id="location"
+                name="location"
+                required
+                // defaultValue={data.location}
+                defaultValue={eventData?.location}
+                placeholder="Enter event location"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+              />
+            </div>
+
+            {/* Image */}
+            <div>
+              <label htmlFor="image" className="mb-2 block text-sm font-medium">
+                Event image
+              </label>
+
+              <input
+                id="image"
+                name="image"
+                required
+                type="file"
+                accept="image/*"
+                className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm file:mr-4 file:border-0 file:bg-black file:px-4 file:py-3 file:text-white hover:file:bg-gray-800"
+              />
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full rounded-lg bg-black px-5 py-3 font-medium uppercase text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? "Creating event..." : "Create event"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }

@@ -1,1 +1,2 @@
 seperate slides events and events
+re order the component and route tree
