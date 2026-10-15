@@ -1,17 +1,27 @@
 import React, { createContext } from "react";
 
+type EventCategory = "Tech" | "Music" | "Workshop" | "Community";
+type EventStatus = "published" | "active" | "completed" | "cancelled";
+
+interface Organizer {
+  _id: string;
+  name: string;
+}
+
 interface Event {
   _id: string;
+  image: string;
   title: string;
   description: string;
   location: string;
+  category: EventCategory;
   startDate: Date;
   endDate: Date;
   capacity: number;
-  image?: string;
-  status: "active" | "cancelled";
-  organizer: string;
-  attendees: string[];
+  isFeatured: boolean;
+  status: EventStatus;
+  organizer: Organizer;
+  registeredCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,6 +52,7 @@ type ParamsType = "q" | "category";
 interface EventContext {
   state: EventState;
   dispatch: React.Dispatch<EventActionType>;
+  searchParams: URLSearchParams;
   updateParams: (param: ParamsType, value?: string) => void; // it's helps set URL query params.
 }
 

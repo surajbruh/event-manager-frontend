@@ -3,6 +3,7 @@ import { axiosInstance } from "../axiosInstance";
 import { useNavigate, useParams } from "react-router";
 import type { Event } from "../service/events/EventContext";
 import { useEvent } from "../service/events/useEvent";
+import { categories } from "../config/data.json";
 
 export default function EventForm() {
   const { id } = useParams();
@@ -116,6 +117,33 @@ export default function EventForm() {
               />
             </div>
 
+            {/* Categories */}
+            <div>
+              <label
+                htmlFor="category"
+                className="mb-2 block text-sm font-medium"
+              >
+                Category
+              </label>
+
+              <select
+                name="category"
+                id="category"
+                defaultValue={eventData?.category || ""}
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
+              >
+                <option value="" disabled hidden>
+                  Select a category
+                </option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Capacity */}
             <div>
               <label
@@ -194,7 +222,6 @@ export default function EventForm() {
                 id="location"
                 name="location"
                 required
-                // defaultValue={data.location}
                 defaultValue={eventData?.location}
                 placeholder="Enter event location"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"

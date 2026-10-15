@@ -6,7 +6,7 @@ import { Link } from "react-router";
 import { useEvent } from "../service/events/useEvent";
 
 export default function Home() {
-  const { state, updateParams } = useEvent();
+  const { state, searchParams, updateParams } = useEvent();
 
   function handleFormSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -62,10 +62,16 @@ export default function Home() {
               <li key={category} className="shrink-0">
                 <button
                   type="button"
-                  className="underline hover:font-semibold"
+                  className={`underline hover:font-semibold ${searchParams.get("category") === category && "font-semibold"} `}
                   onClick={() => updateParams("category", category)}
                 >
-                  {category || "All"}
+                  {category || (
+                    <p
+                      className={`${!searchParams.get("category") && "font-semibold"}`}
+                    >
+                      All
+                    </p>
+                  )}
                 </button>
               </li>
             ))}
@@ -95,7 +101,7 @@ export default function Home() {
                   </figure>
 
                   <p className="text-xs text-green-500">
-                    {event.capacity - event.attendees.length} spots left
+                    {event.capacity - event.registeredCount} spots left
                   </p>
 
                   <div className="leading-tight">

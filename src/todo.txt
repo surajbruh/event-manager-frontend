@@ -1,2 +1,9 @@
 seperate slides events and events
 re order the component and route tree
+
+event provider should fetch all events
+slides component should have featured events
+home page fetches events while handling URLserachParams
+fix logic flow of events users auth 
+
+validate and sanitize user input in event from

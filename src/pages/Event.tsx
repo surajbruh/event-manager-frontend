@@ -4,12 +4,14 @@ import { axiosInstance } from "../axiosInstance";
 import { useEvent } from "../service/events/useEvent";
 import { useAuth } from "../service/auth/useAuth";
 import { formatEventDate } from "../config/formatDate";
+import { useUser } from "../service/user/useUser";
 
 export default function Event() {
   const { id } = useParams();
 
   const { state: auth } = useAuth();
   const { state: eventState, dispatch } = useEvent();
+  const { state: userDetials } = useUser();
 
   const [registering, setRegistering] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -22,12 +24,13 @@ export default function Event() {
 
     axiosInstance
       .get(`/events/${id}`)
-      .then((response) =>
+      .then((response) => {
         dispatch({
           type: "SET_EVENT",
           payload: response.data.event,
-        }),
-      )
+        });
+        console.log(response.data.event);
+      })
       .finally(() =>
         dispatch({
           type: "FETCHING_EVENT",
@@ -49,9 +52,11 @@ export default function Event() {
 
   const event = eventState.selectedEvent;
 
-  const spotsLeft = event.capacity - event.attendees.length;
+  const spotsLeft = event.capacity - event.registeredCount;
   const isRegistered = auth.user
-    ? event.attendees.includes(auth.user.id)
+    ? userDetials.registeredEvents.some(
+        (ticket) => ticket.event._id === event._id,
+      )
     : false;
 
   async function handleRegistration() {
@@ -63,7 +68,7 @@ export default function Event() {
     try {
       setRegistering(true);
 
-      const response = await axiosInstance.patch(`/events/${id}`);
+      const response = await axiosInstance.post(`/events/${id}/register`);
 
       dispatch({
         type: "SET_EVENT",
@@ -105,7 +110,7 @@ export default function Event() {
         {/* Event information */}
         <header className="mb-8 sm:mb-10">
           <p className="mb-2 text-sm capitalize text-gray-600">
-            Hosted by {event.organizer}
+            Hosted by {event.organizer.name}
           </p>
 
           <h1 className="mb-2 text-4xl font-bold uppercase leading-tight sm:text-5xl md:text-[52px]">
@@ -176,7 +181,8 @@ export default function Event() {
 
         {/* Event controls */}
         {auth.user &&
-          (auth.user.role === "admin" || event.organizer === auth.user.id) && (
+          (auth.user.role === "admin" ||
+            event.organizer._id === auth.user.id) && (
             <section
               aria-label="Event management"
               className="flex flex-col gap-3 sm:flex-row sm:gap-4"

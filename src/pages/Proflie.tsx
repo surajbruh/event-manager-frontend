@@ -3,6 +3,7 @@ import { axiosInstance } from "../axiosInstance";
 import { useAuth } from "../service/auth/useAuth";
 import { useEvent } from "../service/events/useEvent";
 import { formatEventDate } from "../config/formatDate";
+import { useUser } from "../service/user/useUser";
 
 // imporve events filtering, maybe update db, schema to allow n to n relationship
 // add server caching
@@ -10,6 +11,8 @@ import { formatEventDate } from "../config/formatDate";
 export default function Profile() {
   const { state: auth, dispatch } = useAuth();
   const { state: eventState } = useEvent();
+  const { state: userDetials } = useUser();
+
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -26,12 +29,10 @@ export default function Profile() {
   }
 
   const eventsHosted = eventState.events.filter(
-    (event) => event.organizer === auth.user!.id,
+    (event) => event.organizer._id === auth.user!.id,
   );
 
-  const registeredEvents = eventState.events.filter((event) =>
-    event.attendees.includes(auth.user!.id),
-  );
+  const tickets = userDetials.registeredEvents;
 
   return (
     <main>
@@ -108,23 +109,26 @@ export default function Profile() {
             Events I'm attending
           </h2>
 
-          {registeredEvents.length === 0 ? (
+          {tickets.length === 0 ? (
             <p className="text-gray-600">No RSVP yet.</p>
           ) : (
             <ul className="space-y-3">
-              {registeredEvents.map((event) => (
-                <li key={event._id}>
+              {tickets.map((ticket) => (
+                <li key={ticket._id}>
                   <Link
-                    to={`/events/${event._id}`}
+                    to={`/events/${ticket.event._id}`}
                     className="flex flex-col gap-2 bg-gray-100 p-3 transition hover:bg-gray-200 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <span className="font-medium">{event.title}</span>
+                    <span className="font-medium">{ticket.event.title}</span>
 
                     <time
-                      dateTime={event.startDate.toString()}
+                      dateTime={ticket.event.startDate.toString()}
                       className="text-sm text-gray-500 sm:text-right"
                     >
-                      {formatEventDate(event.startDate.toString()).compact}
+                      {
+                        formatEventDate(ticket.event.startDate.toString())
+                          .compact
+                      }
                     </time>
                   </Link>
                 </li>

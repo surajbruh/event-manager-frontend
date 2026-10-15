@@ -91,21 +91,23 @@ function EventProvider({ children }: { children: React.ReactNode }) {
     setSearchParams(n);
   }
 
+  if (state.loading.events)
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+        <p aria-live="polite">Fetching events...</p>
+      </main>
+    );
+
   return (
     <EventCtx.Provider
       value={{
         state,
         dispatch,
+        searchParams,
         updateParams,
       }}
     >
-      {state.loading.events ? (
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
-          <p aria-live="polite">Fetching events...</p>
-        </main>
-      ) : (
-        <>{children}</>
-      )}
+      {children}
     </EventCtx.Provider>
   );
 }
