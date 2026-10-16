@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router";
-import { axiosInstance } from "../axiosInstance";
 import { useAuth } from "../service/auth/useAuth";
+import { registerUser, loginUser } from "../service/auth/authService";
 
 const registerPayload = {
   name: "suraj",
   email: "imsurajyadav088@gmail.com",
   password: "password",
 };
+
 const loginPayload = {
   email: "admin@event.com",
   password: "password123",
@@ -18,31 +19,20 @@ export default function AuthPage({ mode }: { mode: "LOGIN" | "REGISTER" }) {
 
   async function handleAuth() {
     try {
-      const url = mode === "REGISTER" ? "/auth/register" : "/auth/login";
-      const data = mode === "REGISTER" ? registerPayload : loginPayload;
+      dispatch({ type: "AUTHENTICATING", payload: true });
 
-      //   updates loading state
-      dispatch({
-        type: "AUTHENTICATING",
-        payload: true,
-      });
+      const data =
+        mode === "REGISTER"
+          ? await registerUser(registerPayload)
+          : await loginUser(loginPayload);
 
-      console.log(url, data);
-      const response = await axiosInstance.post(url, data);
-
-      dispatch({
-        type: "SET_USER",
-        payload: response.data.user,
-      });
+      dispatch({ type: "SET_USER", payload: data });
 
       nav("/");
     } catch (error) {
       console.error(error);
     } finally {
-      dispatch({
-        type: "AUTHENTICATING",
-        payload: false,
-      });
+      dispatch({ type: "AUTHENTICATING", payload: false });
     }
   }
 

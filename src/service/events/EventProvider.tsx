@@ -5,8 +5,8 @@ import {
   type EventState,
   type ParamsType,
 } from "./EventContext";
-import { axiosInstance } from "../../axiosInstance";
 import { useSearchParams } from "react-router";
+import { fetchEvents } from "./eventService";
 
 function reducer(state: EventState, action: EventActionType): EventState {
   switch (action.type) {
@@ -70,14 +70,8 @@ function EventProvider({ children }: { children: React.ReactNode }) {
     if (category) querySearch.set("category", category);
 
     // api request
-    axiosInstance
-      .get(`/events?${querySearch}`)
-      .then((response) => {
-        dispatch({
-          type: "SET_EVENTS",
-          payload: response.data.events,
-        });
-      })
+    fetchEvents(querySearch)
+      .then((data) => dispatch({ type: "SET_EVENTS", payload: data }))
       .catch(() => {})
       .finally(() => dispatch({ type: "FETCHING_EVENTS", payload: false }));
   }, [q, category]);

@@ -5,6 +5,7 @@ import { useEvent } from "../service/events/useEvent";
 import { useAuth } from "../service/auth/useAuth";
 import { formatEventDate } from "../config/formatDate";
 import { useUser } from "../service/user/useUser";
+import { fetchEventById } from "../service/events/eventService";
 
 export default function Event() {
   const { id } = useParams();
@@ -22,21 +23,12 @@ export default function Event() {
   useEffect(() => {
     dispatch({ type: "FETCHING_EVENT", payload: true });
 
-    axiosInstance
-      .get(`/events/${id}`)
-      .then((response) => {
-        dispatch({
-          type: "SET_EVENT",
-          payload: response.data.event,
-        });
-        console.log(response.data.event);
-      })
-      .finally(() =>
-        dispatch({
-          type: "FETCHING_EVENT",
-          payload: false,
-        }),
-      );
+    if (!id) return;
+
+    fetchEventById(id)
+      .then((data) => dispatch({ type: "SET_EVENT", payload: data }))
+      .catch(() => {})
+      .finally(() => dispatch({ type: "FETCHING_EVENT", payload: false }));
   }, [id, dispatch]);
 
   // loading state
@@ -102,6 +94,12 @@ export default function Event() {
     } finally {
       setDeleting(false);
     }
+  }
+
+  function handleNav() {
+    dispatch({ type: "SET_EVENT", payload: null });
+    navigate(`/events/${id}/edit`);
+    return;
   }
 
   return (
@@ -196,7 +194,7 @@ export default function Event() {
 
               <button
                 type="button"
-                onClick={() => navigate(`/events/${id}/edit`)}
+                onClick={handleNav}
                 className="w-full rounded-xl border px-4 py-2 hover:underline sm:w-fit sm:px-5"
               >
                 Edit event

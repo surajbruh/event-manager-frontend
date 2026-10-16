@@ -1,9 +1,9 @@
 import { useNavigate, Link } from "react-router";
-import { axiosInstance } from "../axiosInstance";
 import { useAuth } from "../service/auth/useAuth";
 import { useEvent } from "../service/events/useEvent";
 import { formatEventDate } from "../config/formatDate";
 import { useUser } from "../service/user/useUser";
+import { logoutUser } from "../service/auth/authService";
 
 // imporve events filtering, maybe update db, schema to allow n to n relationship
 // add server caching
@@ -16,16 +16,18 @@ export default function Profile() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    dispatch({ type: "SIGNING_OUT", payload: true });
+    try {
+      dispatch({ type: "SIGNING_OUT", payload: true });
 
-    await axiosInstance
-      .post("/auth/logout")
-      .then(() => {
-        dispatch({ type: "SET_USER", payload: null });
-        navigate("/");
-      })
-      .catch(() => {})
-      .finally(() => dispatch({ type: "SIGNING_OUT", payload: false }));
+      await logoutUser();
+
+      dispatch({ type: "SET_USER", payload: null });
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      dispatch({ type: "SIGNING_OUT", payload: false });
+    }
   }
 
   const eventsHosted = eventState.events.filter(

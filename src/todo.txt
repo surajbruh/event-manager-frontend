@@ -7,3 +7,5 @@ home page fetches events while handling URLserachParams
 fix logic flow of events users auth 
 
 validate and sanitize user input in event from
+
+update loading state

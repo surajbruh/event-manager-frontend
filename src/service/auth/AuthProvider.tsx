@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react";
 import { ctx, type ActionType, type AuthState } from "./AuthContext";
-import { axiosInstance } from "../../axiosInstance";
+import { authenticateUser } from "./authService";
 
 const initialState: AuthState = {
   user: null,
@@ -55,17 +55,9 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    axiosInstance
-      .get("/auth/me")
-      .then((response) => {
-        console.log(response);
-        // set user
-        dispatch({
-          type: "SET_USER",
-          payload: response.data.user,
-        });
-      })
-      .catch(() => {})
+    authenticateUser()
+      .then((data) => dispatch({ type: "SET_USER", payload: data }))
+      .catch((error) => console.error(error))
       .finally(() => dispatch({ type: "AUTHENTICATING", payload: false }));
   }, []);
 

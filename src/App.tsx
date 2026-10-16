@@ -11,6 +11,7 @@ import AuthPage from "./pages/AuthPage";
 import Profile from "./pages/Proflie";
 import EventPage from "./pages/Event";
 import EventForm from "./pages/EventForm";
+import HostEventForm from "./pages/HostEventForm";
 
 export default function App() {
   const { state: auth } = useAuth();
@@ -33,7 +34,7 @@ export default function App() {
         <Route path="/auth/login" element={<AuthPage mode={"LOGIN"} />} />
         <Route element={<Protected />}>
           <Route path="/profile" element={<Profile />} />
-          <Route path="/events/new" element={<EventForm />} />
+          <Route path="/events/new" element={<HostEventForm />} />
           <Route path="/events/:id/edit" element={<EventForm />} />
         </Route>
         <Route path="events/:id" element={<EventPage />} />

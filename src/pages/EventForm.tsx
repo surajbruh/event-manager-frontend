@@ -1,40 +1,32 @@
 import { useEffect, useState } from "react";
-import { axiosInstance } from "../axiosInstance";
 import { useNavigate, useParams } from "react-router";
-import type { Event } from "../service/events/EventContext";
 import { useEvent } from "../service/events/useEvent";
 import { categories } from "../config/data.json";
+import { fetchEventById, updateEvent } from "../service/events/eventService";
+import NotFound from "./NotFound";
 
 export default function EventForm() {
   const { id } = useParams();
-
-  const [eventData, setEventData] = useState<Event | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  // const [eventCreated, setEventCreated] = useState(false);
-  const [fetching, setFetching] = useState(true);
-
-  const navigate = useNavigate();
-
   const { state, dispatch } = useEvent();
+
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (submitting) return;
+    if (!id || submitting) return;
 
     setSubmitting(true);
 
     const formData = new FormData(e.currentTarget);
-    console.log(formData);
 
     try {
-      const response = await axiosInstance.post("/events", formData);
-      dispatch({
-        type: "SET_EVENTS",
-        payload: [...state.events, response.data.event],
-      });
-
+      const data = await updateEvent(id, formData);
+      dispatch({ type: "SET_EVENTS", payload: [...state.events, data] });
       alert("Event created successfully");
+      // clearing the state cuz we are navigating away
+      dispatch({ type: "SET_EVENT", payload: null });
       navigate("/");
     } catch (error) {
       console.error(error);
@@ -44,22 +36,23 @@ export default function EventForm() {
   }
 
   useEffect(() => {
-    console.log(id);
     if (!id) return;
-    axiosInstance
-      .get(`/events/${id}`)
-      .then((response) => setEventData(response.data.event))
-      .catch(() => {})
-      .finally(() => setFetching(false));
-  }, [id]);
+    dispatch({ type: "FETCHING_EVENT", payload: true });
+    fetchEventById(id)
+      .then((data) => dispatch({ type: "SET_EVENT", payload: data }))
+      .catch((error) => console.error(error))
+      .finally(() => dispatch({ type: "FETCHING_EVENT", payload: false }));
+  }, [dispatch, id]);
 
-  if (fetching && id) {
+  if (state.loading.event && id) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
         <p aria-live="polite">Fetching event details...</p>
       </main>
     );
   }
+
+  if (!state.selectedEvent) return <NotFound />;
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 sm:py-12">
@@ -90,7 +83,7 @@ export default function EventForm() {
                 name="title"
                 required
                 minLength={3}
-                defaultValue={eventData?.title}
+                defaultValue={state.selectedEvent?.title}
                 placeholder="Enter event title"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
               />
@@ -111,7 +104,7 @@ export default function EventForm() {
                 required
                 minLength={10}
                 rows={5}
-                defaultValue={eventData?.description}
+                defaultValue={state.selectedEvent?.description}
                 placeholder="Describe your event..."
                 className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
               />
@@ -129,7 +122,7 @@ export default function EventForm() {
               <select
                 name="category"
                 id="category"
-                defaultValue={eventData?.category || ""}
+                defaultValue={state.selectedEvent?.category || ""}
                 required
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
               >
@@ -159,7 +152,7 @@ export default function EventForm() {
                 type="number"
                 min={1}
                 required
-                defaultValue={eventData?.capacity}
+                defaultValue={state.selectedEvent?.capacity}
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
               />
             </div>
@@ -222,7 +215,7 @@ export default function EventForm() {
                 id="location"
                 name="location"
                 required
-                defaultValue={eventData?.location}
+                defaultValue={state.selectedEvent?.location}
                 placeholder="Enter event location"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-black focus:ring-1 focus:ring-black"
               />
