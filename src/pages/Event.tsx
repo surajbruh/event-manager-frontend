@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { axiosInstance } from "../axiosInstance";
 import { useEvent } from "../service/events/useEvent";
 import { useAuth } from "../service/auth/useAuth";
 import { formatEventDate } from "../config/formatDate";
 import { useUser } from "../service/user/useUser";
-import { fetchEventById } from "../service/events/eventService";
+import { deleteEvent, fetchEventById } from "../service/events/eventService";
+import { registerUserForEvent } from "../service/user/userService";
 
 export default function Event() {
   const { id } = useParams();
@@ -52,6 +52,8 @@ export default function Event() {
     : false;
 
   async function handleRegistration() {
+    if (!id) return;
+
     if (!auth.user) {
       navigate("/auth/login");
       return;
@@ -60,12 +62,13 @@ export default function Event() {
     try {
       setRegistering(true);
 
-      const response = await axiosInstance.post(`/events/${id}/register`);
-
-      dispatch({
-        type: "SET_EVENT",
-        payload: response.data.event,
+      const data = await registerUserForEvent(id);
+      const updatedEvents = eventState.events.map((ev) => {
+        if (ev._id === eventState.selectedEvent!._id) return data.event;
+        return ev;
       });
+      dispatch({ type: "SET_EVENT", payload: data.event });
+      dispatch({ type: "SET_EVENTS", payload: updatedEvents });
     } catch (error) {
       console.error(error);
     } finally {
@@ -74,20 +77,18 @@ export default function Event() {
   }
 
   async function handleDelete() {
+    if (!id) return;
+
     try {
       setDeleting(true);
-      await axiosInstance.delete(`/events/${id}`);
+      const data = await deleteEvent(id);
+      const updatedEvents = eventState.events.filter(
+        (ev) => ev._id! == data._id,
+      );
       // update current selected event state
-      dispatch({
-        type: "SET_EVENT",
-        payload: null,
-      });
+      dispatch({ type: "SET_EVENT", payload: null });
+      dispatch({ type: "SET_EVENTS", payload: updatedEvents });
 
-      // update events state
-      dispatch({
-        type: "SET_EVENTS",
-        payload: [...eventState.events.filter((ev) => ev._id !== id)],
-      });
       navigate("/");
     } catch (error) {
       console.error(error);

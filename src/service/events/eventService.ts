@@ -21,3 +21,8 @@ export async function updateEvent(id: string, data: FormData) {
   const res = await axiosInstance.patch(`/events/${id}`, data);
   return res.data.event as Event;
 }
+
+export async function deleteEvent(id: string) {
+  const res = await axiosInstance.delete(`/events/${id}`);
+  return res.data as Event;
+}
