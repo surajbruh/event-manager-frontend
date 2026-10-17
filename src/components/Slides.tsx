@@ -16,6 +16,13 @@ export default function Slides() {
     navigate(`/events/${eventId}`);
   }
 
+  if (state.loading.featuredEvents)
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-8">
+        <p aria-live="polite">Fetching featured events...</p>
+      </main>
+    );
+
   return (
     <section aria-label="Featured events">
       <Swiper
@@ -29,7 +36,7 @@ export default function Slides() {
         loop
         className="relative h-[50vh] max-h-200 min-h-80 w-full sm:h-[55vh] md:h-[65vh]"
       >
-        {state.events.map((event) => (
+        {state.featuredEvents.map((event) => (
           <SwiperSlide key={event._id} className="relative">
             <figure className="absolute inset-0 -z-20 ">
               <img

@@ -26,3 +26,8 @@ export async function deleteEvent(id: string) {
   const res = await axiosInstance.delete(`/events/${id}`);
   return res.data as Event;
 }
+
+export async function fetchFeaturedEvents() {
+  const res = await axiosInstance.get("/events?featured");
+  return res.data.events as Event[];
+}

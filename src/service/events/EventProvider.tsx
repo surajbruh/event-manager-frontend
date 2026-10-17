@@ -6,7 +6,7 @@ import {
   type ParamsType,
 } from "./EventContext";
 import { useSearchParams } from "react-router";
-import { fetchEvents } from "./eventService";
+import { fetchEvents, fetchFeaturedEvents } from "./eventService";
 
 function reducer(state: EventState, action: EventActionType): EventState {
   switch (action.type) {
@@ -40,6 +40,21 @@ function reducer(state: EventState, action: EventActionType): EventState {
         },
       };
 
+    case "SET_FEATURED_EVENTS":
+      return {
+        ...state,
+        featuredEvents: action.payload,
+      };
+
+    case "FETCHING_FEATURED_EVENTS":
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          featuredEvents: action.payload,
+        },
+      };
+
     default:
       return state;
   }
@@ -50,8 +65,10 @@ const initialState: EventState = {
   loading: {
     events: true, //true because EventProvider mounts before App
     event: false,
+    featuredEvents: true,
   },
   selectedEvent: null,
+  featuredEvents: [],
 };
 
 function EventProvider({ children }: { children: React.ReactNode }) {
@@ -61,7 +78,7 @@ function EventProvider({ children }: { children: React.ReactNode }) {
 
   const q = searchParams.get("q") || "";
   const category = searchParams.get("category") || "";
-  // const page = searchParams.get("page") || 1;
+  const page = searchParams.get("page") || 1;
 
   useEffect(() => {
     // query params
@@ -74,7 +91,19 @@ function EventProvider({ children }: { children: React.ReactNode }) {
       .then((data) => dispatch({ type: "SET_EVENTS", payload: data }))
       .catch(() => {})
       .finally(() => dispatch({ type: "FETCHING_EVENTS", payload: false }));
-  }, [q, category]);
+  }, [q, category, page]);
+
+  useEffect(() => {
+    fetchFeaturedEvents()
+      .then((data) => {
+        console.log(data);
+        dispatch({ type: "SET_FEATURED_EVENTS", payload: data });
+      })
+      .catch((error) => console.error(error))
+      .finally(() =>
+        dispatch({ type: "FETCHING_FEATURED_EVENTS", payload: false }),
+      );
+  }, []);
 
   function updateParams(param: ParamsType, value?: string): void {
     const n = new URLSearchParams(searchParams);

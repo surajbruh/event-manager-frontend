@@ -31,8 +31,10 @@ interface EventState {
   loading: {
     events: boolean;
     event: boolean;
+    featuredEvents: boolean;
   };
   selectedEvent: Event | null;
+  featuredEvents: Event[];
 }
 
 type EventActionType =
@@ -44,6 +46,11 @@ type EventActionType =
   | { type: "SET_EVENT"; payload: Event | null }
   | {
       type: "FETCHING_EVENT";
+      payload: boolean;
+    }
+  | { type: "SET_FEATURED_EVENTS"; payload: Event[] }
+  | {
+      type: "FETCHING_FEATURED_EVENTS";
       payload: boolean;
     };
 
