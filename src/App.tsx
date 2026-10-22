@@ -12,6 +12,7 @@ import EventPage from "./pages/Event";
 import EventForm from "./pages/EventForm";
 import HostEventForm from "./pages/HostEventForm";
 import AuthForm from "./pages/AuthFrom";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   const { state: auth } = useAuth();
@@ -27,6 +28,18 @@ export default function App() {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <Header />
       <Routes>
         <Route index element={<Home />} />

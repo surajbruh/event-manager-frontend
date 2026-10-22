@@ -9,3 +9,5 @@ fix logic flow of events users auth
 validate and sanitize user input in event from
 
 update loading state
+
+add toast notification
