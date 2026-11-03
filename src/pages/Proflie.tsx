@@ -4,6 +4,7 @@ import { useEvent } from "../service/events/useEvent";
 import { formatEventDate } from "../config/formatDate";
 import { useUser } from "../service/user/useUser";
 import { logoutUser } from "../service/auth/authService";
+import { errorToast } from "../reactToast";
 
 // imporve events filtering, maybe update db, schema to allow n to n relationship
 // add server caching
@@ -23,8 +24,16 @@ export default function Profile() {
 
       dispatch({ type: "SET_USER", payload: null });
       navigate("/");
-    } catch (error) {
-      console.error(error);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Profile error", error);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.data?.message ||
+        error?.message ||
+        `Unable to fetch profile detials, Please try again later`;
+      errorToast(errorMessage);
     } finally {
       dispatch({ type: "SIGNING_OUT", payload: false });
     }

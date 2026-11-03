@@ -6,6 +6,7 @@ import { formatEventDate } from "../config/formatDate";
 import { useUser } from "../service/user/useUser";
 import { deleteEvent, fetchEventById } from "../service/events/eventService";
 import { registerUserForEvent } from "../service/user/userService";
+import { errorToast } from "../reactToast";
 
 export default function Event() {
   const { id } = useParams();
@@ -27,7 +28,15 @@ export default function Event() {
 
     fetchEventById(id)
       .then((data) => dispatch({ type: "SET_EVENT", payload: data }))
-      .catch(() => {})
+      .catch((error) => {
+        console.error("Fetch event error", error);
+        const errorMessage =
+          error?.response?.data?.message ||
+          error?.data?.message ||
+          error?.message ||
+          `Unable to fetch event details, Please check your credentials`;
+        errorToast(errorMessage);
+      })
       .finally(() => dispatch({ type: "FETCHING_EVENT", payload: false }));
   }, [id, dispatch]);
 
@@ -69,6 +78,7 @@ export default function Event() {
       });
       dispatch({ type: "SET_EVENT", payload: data.event });
       dispatch({ type: "SET_EVENTS", payload: updatedEvents });
+      // userDispatch({ type: "SET_REGISTERED_EVENTS", payload: data.event });
     } catch (error) {
       console.error(error);
     } finally {

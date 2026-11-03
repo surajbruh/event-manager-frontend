@@ -3,6 +3,7 @@ import { categories } from "../config/data.json";
 import { createEvent } from "../service/events/eventService";
 import { useNavigate } from "react-router";
 import { useEvent } from "../service/events/useEvent";
+import { errorToast, successToast } from "../reactToast";
 export default function HostEventForm() {
   const { state, dispatch } = useEvent();
   const [submitting, setSubmitting] = useState(false);
@@ -21,10 +22,20 @@ export default function HostEventForm() {
       const data = await createEvent(formData);
       dispatch({ type: "SET_EVENTS", payload: [...state.events, data] });
 
-      alert("Event created successfully");
+      // alert("Event created successfully");
       navigate("/");
-    } catch (error) {
-      console.error(error);
+      successToast("Event published successfully");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Form submission error:", error);
+
+      const errorMessage =
+        error?.response?.data?.message || // Common for Axios / backend response bodies
+        error?.data?.message || // Alternative backend response structure
+        error?.message || // Standard JS Error message
+        `Unable to submit event details, Please try again later!`;
+
+      errorToast(errorMessage);
     } finally {
       setSubmitting(false);
     }

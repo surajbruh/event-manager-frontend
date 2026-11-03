@@ -7,6 +7,7 @@ import {
 } from "./EventContext";
 import { useSearchParams } from "react-router";
 import { fetchEvents, fetchFeaturedEvents } from "./eventService";
+import { errorToast } from "../../reactToast";
 
 function reducer(state: EventState, action: EventActionType): EventState {
   switch (action.type) {
@@ -89,7 +90,7 @@ function EventProvider({ children }: { children: React.ReactNode }) {
     // api request
     fetchEvents(querySearch)
       .then((data) => dispatch({ type: "SET_EVENTS", payload: data }))
-      .catch(() => {})
+      .catch((error) => console.error(error))
       .finally(() => dispatch({ type: "FETCHING_EVENTS", payload: false }));
   }, [q, category, page]);
 
@@ -99,7 +100,16 @@ function EventProvider({ children }: { children: React.ReactNode }) {
         console.log(data);
         dispatch({ type: "SET_FEATURED_EVENTS", payload: data });
       })
-      .catch((error) => console.error(error))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) => {
+        console.error("Event error:", error);
+        const errorMessage =
+          error?.response?.data?.message || // Common for Axios / backend response bodies
+          error?.data?.message || // Alternative backend response structure
+          error?.message || // Standard JS Error message
+          `Unable to fetch data from the server, Try again after few mintues!`;
+        errorToast(errorMessage);
+      })
       .finally(() =>
         dispatch({ type: "FETCHING_FEATURED_EVENTS", payload: false }),
       );

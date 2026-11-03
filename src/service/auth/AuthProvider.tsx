@@ -1,6 +1,7 @@
 import { useEffect, useReducer } from "react";
 import { ctx, type ActionType, type AuthState } from "./AuthContext";
 import { authenticateUser } from "./authService";
+import { errorToast } from "../../reactToast";
 
 const initialState: AuthState = {
   user: null,
@@ -57,7 +58,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     authenticateUser()
       .then((data) => dispatch({ type: "SET_USER", payload: data }))
-      .catch((error) => console.error(error))
+      .catch((error) => {
+        console.error(error);
+        errorToast("Unable to authenticate! please try login in!");
+      })
       .finally(() => dispatch({ type: "AUTHENTICATING", payload: false }));
   }, []);
 

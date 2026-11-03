@@ -3,6 +3,7 @@ import { loginUser, registerUser } from "../service/auth/authService";
 import { useAuth } from "../service/auth/useAuth";
 import { useNavigate } from "react-router";
 import { type AuthPayload } from "../service/auth/authService";
+import { errorToast, successToast } from "../reactToast";
 
 const userRole = ["user", "organizer", "admin"];
 
@@ -21,8 +22,7 @@ export default function AuthForm({ mode }: { mode: "LOGIN" | "REGISTER" }) {
     setSubmitting(true);
 
     const formData = Object.fromEntries(new FormData(e.currentTarget));
-    console.log(formData);
-    // return;
+
     const fn = isSignUpPage ? registerUser : loginUser;
 
     try {
@@ -30,8 +30,18 @@ export default function AuthForm({ mode }: { mode: "LOGIN" | "REGISTER" }) {
       dispatch({ type: "SET_USER", payload: data });
 
       navigate("/");
-    } catch (error) {
-      console.error(error);
+      successToast(`${isSignUpPage ? "Sign Up" : "Logged In"} successfully`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Auth error:", error);
+
+      const errorMessage =
+        error?.response?.data?.message || // Common for Axios / backend response bodies
+        error?.data?.message || // Alternative backend response structure
+        error?.message || // Standard JS Error message
+        `Unable to ${isSignUpPage ? "Sign Up" : "Log In"}, Please check your credentials`;
+
+      errorToast(errorMessage);
     } finally {
       setSubmitting(false);
     }

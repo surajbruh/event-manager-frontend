@@ -18,7 +18,7 @@ interface UserState {
 }
 
 type UserActionType =
-  | { type: "SET EVENTS"; payload: Ticket[] }
+  | { type: "SET_REGISTERED_EVENTS"; payload: Ticket[] }
   | { type: "FETCHING EVENTS"; payload: boolean };
 
 const defaultValue = null;

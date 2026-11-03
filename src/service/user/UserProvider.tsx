@@ -12,7 +12,7 @@ const initialState: UserState = {
 
 function reducer(state: UserState, action: UserActionType) {
   switch (action.type) {
-    case "SET EVENTS":
+    case "SET_REGISTERED_EVENTS":
       return {
         ...state,
         registeredEvents: action.payload,
@@ -40,7 +40,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     axiosInstance
       .get("/users/me/events")
       .then((response) => {
-        dispatch({ type: "SET EVENTS", payload: response.data.tickets });
+        dispatch({ type: "SET_REGISTERED_EVENTS", payload: response.data.tickets });
       })
       .finally(() => dispatch({ type: "FETCHING EVENTS", payload: false }));
   }, [auth.user]);
